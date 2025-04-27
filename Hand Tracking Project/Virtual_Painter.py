@@ -8,9 +8,9 @@ mp_hands = mp.solutions.hands
 
 # For webcam input:
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cap.set(cv2.CAP_PROP_FPS, 5)
-width = 1280
-height = 720
+cap.set(cv2.CAP_PROP_FPS, 30)
+width = 640
+height = 360
 cap.set(3, width)
 cap.set(4, height)
 
@@ -18,15 +18,15 @@ cap.set(4, height)
 imgCanvas = np.zeros((height, width, 3), np.uint8)
 
 # Getting all header images in a list
-folderPath = 'Hand Tracking Project\Header'
+folderPath = '.\\Header'
 myList = os.listdir(folderPath)
-overlayList = []
+#overlayList = []
 for imPath in myList:
     image = cv2.imread(f'{folderPath}/{imPath}')
-    overlayList.append(image)
+    #overlayList.append(image)
 
 # Presettings:
-header = overlayList[0]
+#header = overlayList[0]
 drawColor = (0, 0, 255)
 thickness = 20 # Thickness of the painting
 tipIds = [4, 8, 12, 16, 20] # Fingertips indexes
@@ -41,7 +41,7 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
 
         # Flip the image horizontally for a later selfie-view display, and convert
         # the BGR image to RGB.
-        image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_BGR2RGB)
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # To improve performance, optionally mark the image as not writeable to
         # pass by reference.
         image.flags.writeable = False
@@ -50,6 +50,25 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
         image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
+                
+                mp_drawing.draw_landmarks(
+                    image, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+
+                # 畫每個關節點的編號
+                for id, lm in enumerate(hand_landmarks.landmark):
+                    h, w, c = image.shape
+                    cx, cy = int(lm.x * w), int(lm.y * h)
+                    
+                    # 文字的位置要依照翻轉進行調整
+                    #flipped_cx = w - cx  # 水平翻轉後，X位置會變成原來的對稱點
+                    cv2.putText(image, str(id), (cx+5, cy-5),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 1)                
+                
+                
+                
+                
+                
+                
                 # Getting all hand points coordinates
                 points = []
                 for lm in hand_landmarks.landmark:
@@ -84,17 +103,17 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
 
                         # Selecting the colors and the eraser on the screen
                         if(y1 < 125):
-                            if(170 < x1 < 295):
-                                header = overlayList[0]
+                            if(0 < x1 < width/4):
+                                #header = overlayList[0]
                                 drawColor = (0, 0, 255)
-                            elif(436 < x1 < 561):
-                                header = overlayList[1]
+                            elif(width/4 < x1 < width/4*2):
+                                #header = overlayList[1]
                                 drawColor = (255, 0, 0)
-                            elif(700 < x1 < 825):
-                                header = overlayList[2]
+                            elif(width/4*3 < x1 < width/4*3.5):
+                                #header = overlayList[2]
                                 drawColor = (0, 255, 0)
-                            elif(980 < x1 < 1105):
-                                header = overlayList[3]
+                            elif(width/4*3.5 < x1 < width/4*4):
+                                #header = overlayList[3]
                                 drawColor = (0, 0, 0)
 
                         cv2.rectangle(image, (x1-10, y1-15), (x2+10, y2+23), drawColor, cv2.FILLED)
@@ -158,7 +177,7 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
                         xp, yp = [x1, y1]
 
         # Setting the header in the video
-        image[0:125, 0:width] = header
+        #image[0:125, 0:width] = header
 
         # The image processing to produce the image of the camera with the draw made in imgCanvas
         imgGray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
@@ -166,7 +185,8 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
         imgInv = cv2.cvtColor(imgInv, cv2.COLOR_GRAY2BGR)
         img = cv2.bitwise_and(image, imgInv)
         img = cv2.bitwise_or(img, imgCanvas)
-
+        #img = cv2.flip(img, 1)
+        img = cv2.resize(img, (1920, 1080))
         cv2.imshow('MediaPipe Hands', img)
         if cv2.waitKey(3) & 0xFF == ord('q'):
             break
