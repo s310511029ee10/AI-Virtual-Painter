@@ -42,6 +42,7 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
 
         # Flip the image horizontally for a later selfie-view display, and convert
         # the BGR image to RGB.
+        #image = cv2.resize(image, (640, 360))
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         # To improve performance, optionally mark the image as not writeable to
         # pass by reference.
@@ -185,11 +186,11 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
         _, imgInv = cv2.threshold(imgGray, 5, 255, cv2.THRESH_BINARY_INV)
         imgInv = cv2.cvtColor(imgInv, cv2.COLOR_GRAY2BGRA)
         
-        
+        image = cv2.resize(image, (1920, 1080))
         image_result = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
         
         #alpha_channel = imgInv[:, :, 3]  # Extract the alpha channel of the mask
-        image_result[:, :, 3] = 0  # Apply the mask to the alpha channel of the image_result
+        image_result[:, :, 3] = 255  # Apply the mask to the alpha channel of the image_result
         
         imgCanvas = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2BGRA)
         img = cv2.bitwise_and(image_result, imgInv)
