@@ -6,17 +6,20 @@ import math
 mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
-# For webcam input:
-cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
-cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
-cap.set(cv2.CAP_PROP_FPS, 30)
+WEBCAM_RAW_RES = (1920, 1080)
+FRAMERATE = 30
+
 width = 1920
 height = 1080
-cap.set(3, width)
-cap.set(4, height)
+# For webcam input:
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap .set(cv2.CAP_PROP_FPS, FRAMERATE)
+cap .set(cv2.CAP_PROP_FRAME_WIDTH, WEBCAM_RAW_RES[0])
+cap .set(cv2.CAP_PROP_FRAME_HEIGHT, WEBCAM_RAW_RES[1])
+cap .set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG")) # add this line
 
 # Image that will contain the drawing and then passed to the camera image
-imgCanvas = np.zeros((height, width, 3), np.uint8)
+imgCanvas = np.zeros((WEBCAM_RAW_RES[1], WEBCAM_RAW_RES[0], 3), np.uint8)
 
 # Getting all header images in a list
 folderPath = '.\\Header'
