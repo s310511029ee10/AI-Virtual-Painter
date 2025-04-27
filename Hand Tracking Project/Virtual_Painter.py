@@ -8,9 +8,10 @@ mp_hands = mp.solutions.hands
 
 # For webcam input:
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 cap.set(cv2.CAP_PROP_FPS, 30)
-width = 640
-height = 360
+width = 1920
+height = 1080
 cap.set(3, width)
 cap.set(4, height)
 
@@ -178,16 +179,29 @@ with mp_hands.Hands(min_detection_confidence=0.85, min_tracking_confidence=0.5, 
 
         # Setting the header in the video
         #image[0:125, 0:width] = header
-
+   
         # The image processing to produce the image of the camera with the draw made in imgCanvas
         imgGray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
         _, imgInv = cv2.threshold(imgGray, 5, 255, cv2.THRESH_BINARY_INV)
-        imgInv = cv2.cvtColor(imgInv, cv2.COLOR_GRAY2BGR)
-        img = cv2.bitwise_and(image, imgInv)
+        imgInv = cv2.cvtColor(imgInv, cv2.COLOR_GRAY2BGRA)
+        
+        
+        image_result = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
+        
+        #alpha_channel = imgInv[:, :, 3]  # Extract the alpha channel of the mask
+        image_result[:, :, 3] = 0  # Apply the mask to the alpha channel of the image_result
+        
+        imgCanvas = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2BGRA)
+        img = cv2.bitwise_and(image_result, imgInv)
         img = cv2.bitwise_or(img, imgCanvas)
+        #print(imgCanvas.shape)
         #img = cv2.flip(img, 1)
         img = cv2.resize(img, (1920, 1080))
         cv2.imshow('MediaPipe Hands', img)
+    
+        
+        
+        
         if cv2.waitKey(3) & 0xFF == ord('q'):
             break
 cap.release()
