@@ -7,7 +7,7 @@ mp_drawing = mp.solutions.drawing_utils
 mp_hands = mp.solutions.hands
 
 WEBCAM_RAW_RES = (1920, 1080)
-FRAMERATE = 30
+FRAMERATE = 60
 
 width = 1920
 height = 1080
